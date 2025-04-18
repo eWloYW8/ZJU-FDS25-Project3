@@ -49,7 +49,7 @@ while len(edges) < m:
 # Create a list to store roads with their lengths
 roads = []
 for c1, c2 in edges:
-    length = random.randint(1, 100)  # Assign a random length between 1 and 100 to each road
+    length = random.randint(1, 30)  # Assign a random length between 1 and 30 to each road
     roads.append((c1, c2, length))  # Add the road as a tuple (node1, node2, length)
 
 # Shuffle the roads to randomize their order
