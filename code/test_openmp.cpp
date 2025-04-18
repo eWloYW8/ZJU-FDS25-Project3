@@ -120,6 +120,15 @@ int main(int argc, char *argv[]) {
 
     remove("test.out"); // Remove the temporary output file "test.out"
 
+    // Replace all occurrences of "\r\n" with "\n" in the output and output_sample strings
+    size_t pos;
+    while ((pos = output.find("\r\n")) != std::string::npos) {
+        output.replace(pos, 2, "\n");
+    }
+    while ((pos = output_sample.find("\r\n")) != std::string::npos) {
+        output_sample.replace(pos, 2, "\n");
+    }
+
     // Remove trailing newlines from both output and output_sample
     while (!output.empty() && output.back() == '\n') {
         output.pop_back();
