@@ -44,43 +44,69 @@ int main(int argc, char *argv[]) {
     // Record the start time (in ticks) before the main logic begins
     start_time = clock();
 
-    int n, m, k; // n: number of nodes, m: number of edges, k: threshold for node appearance
-    scanf("%d %d %d", &n, &m, &k); // Read the number of nodes, edges, and threshold
+    int n, m, k; // n: number of nodes, m: number of edges, k: threshold for node occurrence
+    scanf("%d %d %d", &n, &m, &k); // Read graph parameters from standard input
     Graph* graph = new Graph(n); // Create a new Graph object with n nodes
     graph->init_from_stdin(m); // Initialize the graph by reading m edges from standard input
     
     int T; // Number of test cases
-    int count[GRAPH_MAX_N] = {0}; // Array to count the appearance of nodes in shortest paths
-    bool flag = false; // Flag to track if any node meets the condition
-    int start, destination; // Variables to store the start and destination nodes for each test case
     scanf("%d", &T); // Read the number of test cases
-    for (int i = 0; i < T; i++) { // Loop through each test case
-        scanf("%d %d", &start, &destination); // Read the start and destination nodes
-        GraphShortestPathSolution* solution = new GraphShortestPathSolution(graph, start); // Create a solution object for shortest path from the start node
-        solution->solve(); // Solve the shortest path problem
-        std::vector<std::vector<int>> all_paths = solution->get_all_shortest_path(destination); // Get all shortest paths to the destination node
-        for (auto path : all_paths) { // Iterate through all shortest paths
-            for (auto node : path) { // Iterate through each node in the path
-                count[node]++; // Increment the count for the node
-            }
-        }
-        for (int j = 0; j < n; j++) { // Check all nodes to see if they meet the condition
-            if (count[j] >= k && j != start && j != destination) { // Node must appear at least k times and not be the start or destination
-                if (flag) { // If a node has already been printed, print a space before the next node
-                    printf(" ");
-                } else {
-                    flag = true; // Set the flag to true after printing the first node
-                }
-                printf("%d", j); // Print the node
-            }
-        }
-        if (!flag) { // If no node meets the condition, print "None"
-            printf("None");
-        }
-        printf("\n"); // Print a newline after processing the test case
-        memset(count, 0, sizeof(count)); // Reset the count array for the next test case
-        flag = false; // Reset the flag for the next test case
+    std::vector<std::pair<int, int>> testCases(T); // Vector to store start and destination nodes for each test case
+    for (int i = 0; i < T; ++i) {
+        scanf("%d %d", &testCases[i].first, &testCases[i].second); // Read each test case
     }
+    
+    std::vector<std::string> results(T); // Vector to store results for each test case
+    
+    // Parallelize the loop using OpenMP
+    #pragma omp parallel for
+    for (int i = 0; i < T; ++i) {
+        int start = testCases[i].first; // Start node for the current test case
+        int dest = testCases[i].second; // Destination node for the current test case
+        std::vector<int> local_count(n, 0); // Vector to count occurrences of nodes in all shortest paths
+        bool flag = false; // Flag to indicate if any node meets the threshold condition
+        std::string result; // String to store the result for the current test case
+        
+        // Solve the shortest path problem for the current start node
+        GraphShortestPathSolution* solution = new GraphShortestPathSolution(graph, start);
+        solution->solve(); // Compute shortest paths from the start node
+        std::vector<std::vector<int>> all_paths = solution->get_all_shortest_path(dest); // Get all shortest paths to the destination node
+        delete solution; // Free the memory allocated for the solution object
+        
+        // Count occurrences of each node in all shortest paths
+        for (const auto& path : all_paths) {
+            for (int node : path) {
+                if (node >= 0 && node < n) { // Ensure the node index is valid
+                    local_count[node]++;
+                }
+            }
+        }
+        
+        // Check if any node (excluding start and destination) meets the threshold condition
+        for (int j = 0; j < n; ++j) {
+            if (local_count[j] >= k && j != start && j != dest) {
+                if (flag) { // If this is not the first node meeting the condition, add a space
+                    result += " ";
+                } else {
+                    flag = true; // Set the flag to true for the first node meeting the condition
+                }
+                result += std::to_string(j); // Append the node index to the result string
+            }
+        }
+        
+        // If no node meets the condition, set the result to "None"
+        if (!flag) {
+            results[i] = "None";
+        } else {
+            results[i] = result; // Otherwise, store the result string
+        }
+    }
+    
+    // Print the results for all test cases
+    for (const auto& res : results) {
+        printf("%s\n", res.c_str());
+    }
+    
     // Record the stop time (in ticks) after the main logic completes
     stop_time = clock();
 

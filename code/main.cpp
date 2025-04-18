@@ -41,4 +41,7 @@ int main() {
         memset(count, 0, sizeof(count)); // Reset the count array for the next test case
         flag = false; // Reset the flag for the next test case
     }
+
+    delete graph;
+    return 0;
 }
