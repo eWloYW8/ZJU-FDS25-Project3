@@ -3,6 +3,7 @@
 #include <cstring> // For memset function
 #include <string> // For using the std::string container
 #include <fstream> // For file stream and istreambuf_iterator
+#include <ctime> // For time-related functions
 #include "Graph.h" // Custom header file for Graph-related classes and functions
 
 // Define the TTY constant based on the operating system
@@ -15,6 +16,8 @@
 // Define the maximum number of nodes in the graph
 #define MAX_OUTPUT 10000
 
+clock_t start, stop;  /* clock_t is a built-in type for processor time (ticks) */
+double duration;      /* Records the run time (seconds) of a function */
 
 int main(int argc, char *argv[]) {
     // Check if the number of arguments is less than 2
@@ -28,6 +31,8 @@ int main(int argc, char *argv[]) {
     freopen(argv[1], "r", stdin); // Redirect standard input to read from the specified file
     freopen("test.out", "w", stdout); // Redirect standard output to a file named "test.out"
     
+    // Record the start time (in ticks) before the main logic begins
+    start = clock();
 
     int n, m, k; // n: number of nodes, m: number of edges, k: threshold for node appearance
     scanf("%d %d %d", &n, &m, &k); // Read the number of nodes, edges, and threshold
@@ -67,12 +72,17 @@ int main(int argc, char *argv[]) {
         flag = false; // Reset the flag for the next test case
     }
 
+    // Record the stop time (in ticks) after the main logic completes
+    stop = clock();
+
     freopen(TTY, "r", stdin); // Redirect standard input back to the terminal
     freopen(TTY, "w", stdout); // Redirect standard output back to the terminal
 
     
     std::string output((std::istreambuf_iterator<char>(std::ifstream("test.out").rdbuf())), std::istreambuf_iterator<char>()); // Read the output from "test.out" into a string
     std::string output_sample((std::istreambuf_iterator<char>(std::ifstream(argv[2]).rdbuf())), std::istreambuf_iterator<char>()); // Read the expected output from the specified file into a string
+
+    remove("test.out"); // Remove the temporary output file "test.out"
 
     // Remove trailing newlines from both output and output_sample
     while (!output.empty() && output.back() == '\n') {
@@ -84,8 +94,14 @@ int main(int argc, char *argv[]) {
 
     if (output == output_sample) { // Compare the output with the expected output
         printf("Correct\n"); // If they match, print "Correct"
+        
+        // Calculate the duration of the program execution in seconds
+        // CLOCKS_PER_SEC is a constant representing the number of ticks per second
+        duration = ((double)(stop - start)) / CLOCKS_PER_SEC;
+
+        // Print the duration of the program execution
+        printf("%lf\n", duration);
     } else {
         printf("Wrong\n"); // If they don't match, print "Wrong"
     }
-
 }
