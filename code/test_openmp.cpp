@@ -6,6 +6,7 @@
 #include <ctime> // For time-related functions
 #include "Graph.h" // Custom header file for Graph-related classes and functions
 #include <unistd.h> // For access() function to check file accessibility
+#include <omp.h> // For OpenMP parallelization
 
 // Define the TTY constant based on the operating system
 #ifdef _WIN32
