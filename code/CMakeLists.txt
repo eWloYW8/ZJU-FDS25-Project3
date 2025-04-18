@@ -7,5 +7,6 @@ project(FDS25_Project3)
 # Include directories for header files
 include_directories(.)  
 
-# Add an executable target
+# Add executable targets
 add_executable(main main.cpp Graph.cpp)
+add_executable(test test.cpp Graph.cpp)
