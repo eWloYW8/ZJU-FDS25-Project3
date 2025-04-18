@@ -1,0 +1,43 @@
+#pragma once
+#include <vector>
+
+// Define the maximum number of nodes in the graph
+#define GRAPH_MAX_N 500
+
+// Graph class represents a graph with adjacency matrix representation
+class Graph {
+public:
+    int n; // Number of nodes in the graph
+    int adj[GRAPH_MAX_N][GRAPH_MAX_N]; // Adjacency matrix to store edge lengths
+
+    // Constructor to initialize the graph with a given number of nodes
+    Graph(int n);
+
+    // Adds an edge between nodes u and v with a specified length
+    void add_edge(int u, int v, int length);
+
+    // Initializes the graph by reading edges from standard input
+    // m represents the number of edges
+    void init_from_stdin(int m);
+};
+
+// GraphShortestPathSolution class is used to solve the shortest path problem
+class GraphShortestPathSolution {
+public:
+    Graph *graph; // Pointer to the graph object
+    int start; // Starting node for the shortest path calculation
+    int visited[GRAPH_MAX_N]; // Array to track visited nodes during pathfinding
+    std::vector<int> path_parent[GRAPH_MAX_N]; // Stores parent nodes for each node in the shortest path
+    int path_length[GRAPH_MAX_N]; // Stores the shortest path length to each node
+    bool solved; // Flag to indicate if the shortest path solution has been computed
+
+    // Constructor to initialize the solution object with a graph and starting node
+    GraphShortestPathSolution(Graph *graph, int start);
+
+    // Solves the shortest path problem using an appropriate algorithm
+    void solve();
+
+    // Retrieves all shortest paths to a specified destination node
+    // Returns a vector of paths, where each path is represented as a vector of nodes
+    std::vector<std::vector<int>> get_all_shortest_path(int destination);
+};
