@@ -64,7 +64,7 @@ Due to its efficiency and accuracy in sparse graphs, Dijkstra's algorithm is wel
 
 Before sketching the main program flow, I will first introduce the main steps and algorithms in this project, which include the build of the graph, the Dijkstra algorithm, the restore of the shortest path, and the identification of transportation hubs.
 
-== The Build of the Graph
+== The Build of the Graph (Data Structure)
 
 To represent the structure of cities and roads, the program uses an adjacency matrix to build the graph. The class `Graph` encapsulates this logic.
 
