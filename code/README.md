@@ -377,12 +377,15 @@ CMake 会自动检测更改并仅重新编译必要的文件。
 **编译器**：gcc version 14.2.0（由 MSYS2 项目构建的 Rev3）  
 **二进制文件**：
   - main.exe：  
-
+    https://zjucube.oss-cn-hangzhou.aliyuncs.com/uploads/2025/04/19/1501589880cbKkektf.exe
   - test.exe：  
+    https://zjucube.oss-cn-hangzhou.aliyuncs.com/uploads/2025/04/19/1502347540bsgYWv2s.exe
 
 ## Linux
 
 **编译器**：gcc version 12.2.0（Debian 12.2.0-14）  
 **二进制文件**：
   - main：  
+    https://zjucube.oss-cn-hangzhou.aliyuncs.com/main
   - test：  
+    https://zjucube.oss-cn-hangzhou.aliyuncs.com/test
