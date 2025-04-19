@@ -367,6 +367,8 @@ Additionally, the `path_parent` structure (precomputed in Dijkstra’s algorithm
 === Improvements
 - Maybe the process can be skiped if the number of paths is too large, and we can just count the number of nodes in the path.
 
+#pagebreak()
+
 = *Appendix*: Source Code (in C)
 
 The project is written in C++ and employs relatively abstract object-oriented encapsulation, which may make it somewhat obscure.

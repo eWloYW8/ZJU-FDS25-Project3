@@ -193,6 +193,11 @@ You can rename the downloaded file by yourself.
   
   - test：  
 
+# Crash?
+
+You may find that the program closes immediately after you finish entering the data. This happens because the program has already printed the result and completed all its execution logic, so it exits on its own.
+
+To avoid missing the output, you should run the program in a terminal instead of double-clicking it. If you're not sure what "terminal" means, please copy this paragraph and ask an AI for help.
 
 
 ---
@@ -389,3 +394,9 @@ CMake 会自动检测更改并仅重新编译必要的文件。
     https://zjucube.oss-cn-hangzhou.aliyuncs.com/main
   - test：  
     https://zjucube.oss-cn-hangzhou.aliyuncs.com/test
+
+# 闪退?
+
+你可能会发现程序在输入完数据后闪退，这是因为程序已经输出了结果并完成全部运行逻辑，此后它会自行退出。
+
+为了避免看不到结果，你应该在终端中使用它，而不是直接双击打开它。如果你不理解 终端 这个词语，请复制这段文字，并向AI寻求帮助。
