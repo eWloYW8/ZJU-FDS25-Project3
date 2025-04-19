@@ -64,7 +64,30 @@ Due to its efficiency and accuracy in sparse graphs, Dijkstra's algorithm is wel
 
 Before sketching the main program flow, I will first introduce the main steps and algorithms in this project, which include the build of the graph, the Dijkstra algorithm, the restore of the shortest path, and the identification of transportation hubs.
 
-== The Build of the Graph (Data Structure)
+== The Build of the Graph
+
+#note(name: [The Graph Data Structure])[
+  A *graph* is a fundamental data structure consisting of:
+  
+  - Core Components
+    - *Vertices (Nodes)*: Represent entities/objects
+    - *Edges*: Represent relationships between vertices
+      - May be *directed* or *undirected*
+      - May have *weights* (numerical values)
+
+  - Common Representations
+    1. *Adjacency Matrix*
+      - Square matrix where entry (i,j) represents edge between   vertex i and j
+      - Efficient for dense graphs
+      - O(1) edge lookup time
+
+    2. *Adjacency List*
+      - Array of linked lists
+      - Each list stores neighbors of a vertex
+      - Memory-efficient for sparse graphs
+
+    Considering that the maximum number of nodes is 500, we choose the adjacency matrix representation for simplicity and efficiency.
+]
 
 To represent the structure of cities and roads, the program uses an adjacency matrix to build the graph. The class `Graph` encapsulates this logic.
 
