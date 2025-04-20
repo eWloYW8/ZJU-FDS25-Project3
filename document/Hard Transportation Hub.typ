@@ -6,9 +6,11 @@
   style: "modified",
   course: none,
   title: "Hard Transportation Hub",
-  date: "2025/04/19",
+  date: "2025/04/20",
   author: none,
 )
+
+#state-block-theme.update("thickness")
 
 = *Chapter 1*: Introduction
 
@@ -388,7 +390,36 @@ In scenarios with exponentially many shortest paths (e.g., graphs with redundant
 Additionally, the `path_parent` structure (precomputed in Dijkstra’s algorithm) contributes $O(V^2)$ space, but this is considered part of the input and not the algorithm’s working space.
 
 === Improvements
-- Maybe the process can be skiped if the number of paths is too large, and we can just count the number of nodes in the path.
+Maybe the process can be skiped if the number of paths is too large, and we can just count the number of paths passing each node.
+
+Based on this conjecture, The follwing is a possible improvement to the algorithm:
+
+#note(name: [Graph Theory and Linear Algebra])[
+
+An unweighted directed graph can be represented as an adjacency matrix A, where each entry (i, j) is either 1 or 0:
+
+- `1` indicates the presence of a directed edge from node `i` to node `j`.
+- `0` indicates the absence of such an edge.
+
+A more universal interpretation is that this matrix encodes the number of edges of length 1 between any pair of points.
+
+Based on the matrix multiplication principle, the power of matrix A, denoted as $A^k$, reflects the number of distinct paths of length k between any two nodes in the graph. Specifically:
+
+- The entry (i, j) in $A^k$ represents the number of paths of exactly length k from node `i` to node `j`.
+- This property can be extended to compute the total number of paths of length ≤ k by summing the powers of A from 1 to k: $ A + A^2 + ... + A^k $
+- The total number of paths from node `i` to node `j` of any length can be computed by summing all powers of A: $ A + A^2 + A^3 + ... + A^k + ... = A(I-A)^(-1) = (I-A)^(-1)-I $
+]
+
+In this project, we can restore the shortest paths to a matrix A, which is much more efficient when the number of paths is large. The matrix A can be constructed as follows, then we can calculate $P = (I-A)^(-1)-I$, which gives us the number of paths between any two nodes.
+
+The number of shortest paths which passes the node N can be calculated by the following formula:
+$ P["start"][N] times P[N]["destination"] $
+
+Then compare the number of paths with the threshold $k$ to determine if the node N is a transportation hub.
+
+This matrix-based approach offers a more scalable alternative to recursive backtracking, especially for dense graphs or graphs with a high degree of redundancy in shortest paths.
+
+*I'm not using this algorithm for this project because linear algebra-related computations require libraries like BLAS, MKL, etc., and leverage hardware features to fully utilize their advantages. If you're interested, you can try implementing it.*
 
 #pagebreak()
 
