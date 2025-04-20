@@ -104,3 +104,21 @@ std::vector<std::vector<int>> GraphShortestPathSolution::get_all_shortest_path(i
     }
     return all_paths; // Return all paths
 }
+
+// Converts the paths to a matrix representation
+std::vector<std::vector<int>> GraphShortestPathSolution::shortest_paths_to_matrix(int destination) {
+    std::vector<std::vector<int>> matrix(graph->n, std::vector<int>(graph->n, 0)); // Initialize the matrix with 0 (no path)
+    _shortest_paths_to_matrix(matrix, destination); // Fill the matrix with path lengths
+    return matrix; // Return the matrix representation of paths
+}
+
+// Recursive helper function to fill the matrix with path lengths
+void GraphShortestPathSolution::_shortest_paths_to_matrix(std::vector<std::vector<int>> &matrix, int destination) {
+    if (destination == start) {
+        return; // Base case: path to itself
+    }
+    for (auto parent : path_parent[destination]) { // Iterate over all parents of the destination
+        matrix[parent][destination] = 1;
+        _shortest_paths_to_matrix(matrix, parent); // Recursively fill the matrix for each parent
+    }
+}

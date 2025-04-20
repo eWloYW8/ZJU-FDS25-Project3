@@ -40,4 +40,11 @@ public:
     // Retrieves all shortest paths to a specified destination node
     // Returns a vector of paths, where each path is represented as a vector of nodes
     std::vector<std::vector<int>> get_all_shortest_path(int destination);
+
+    // Converts the paths to a matrix representation
+    std::vector<std::vector<int>> shortest_paths_to_matrix(int destination); 
+
+private:
+    // Recursive helper function to fill the matrix with path lengths
+    void _shortest_paths_to_matrix(std::vector<std::vector<int>> &matrix, int destination);
 };
