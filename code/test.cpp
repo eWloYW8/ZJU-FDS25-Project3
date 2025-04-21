@@ -58,20 +58,13 @@ int main(int argc, char *argv[]) {
         scanf("%d %d", &start, &destination); // Read the start and destination nodes
         GraphShortestPathSolution* solution = new GraphShortestPathSolution(graph, start); // Create a solution object for shortest path from the start node
         solution->solve(); // Solve the shortest path problem
-        std::vector<std::vector<int>> all_paths = solution->get_all_shortest_path(destination); // Get all shortest paths to the destination node
-        for (auto path : all_paths) { // Iterate through all shortest paths
-            for (auto node : path) { // Iterate through each node in the path
-                count[node]++; // Increment the count for the node
-            }
-        }
+        std::vector<int> count_path_to_start = solution->count_path_to_start(destination); // Count paths to the start node
+        std::vector<int> count_path_to_destination = solution->count_path_to_destination(destination); // Count paths to the destination node
         for (int j = 0; j < n; j++) { // Check all nodes to see if they meet the condition
-            if (count[j] >= k && j != start && j != destination) { // Node must appear at least k times and not be the start or destination
-                if (flag) { // If a node has already been printed, print a space before the next node
-                    printf(" ");
-                } else {
-                    flag = true; // Set the flag to true after printing the first node
-                }
-                printf("%d", j); // Print the node
+            if (count_path_to_start[j] != -1 && j != start && j != destination && count_path_to_start[j]*count_path_to_destination[j] >= k) {
+                if (flag) printf(" "); // Print a space if this is not the first node meeting the condition
+                else flag = true; // Set the flag to true if this is the first node meeting the condition
+                printf("%d", j); // Print the node number
             }
         }
         if (!flag) { // If no node meets the condition, print "None"

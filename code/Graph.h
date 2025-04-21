@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <array>
 
 // Define the maximum number of nodes in the graph
 #define GRAPH_MAX_N 500
@@ -44,7 +45,19 @@ public:
     // Converts the paths to a matrix representation
     std::vector<std::vector<int>> shortest_paths_to_matrix(int destination); 
 
+    // Counts the number of paths from each node to the start node
+    std::vector<int> count_path_to_start(int destination);
+
+    // Counts the number of paths from each node to the destination node
+    std::vector<int> count_path_to_destination(int destination);
+
 private:
     // Recursive helper function to fill the matrix with path lengths
     void _shortest_paths_to_matrix(std::vector<std::vector<int>> &matrix, int destination);
+
+    // Recursive helper function to count the number of paths from each node to the start node
+    int _count_path_to_start(int destination, std::vector<int> &count_path);
+
+    // Recursive helper function to count the number of paths from each node to the destination node
+    int _count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<std::vector<int>> matrix);
 };

@@ -122,3 +122,51 @@ void GraphShortestPathSolution::_shortest_paths_to_matrix(std::vector<std::vecto
         _shortest_paths_to_matrix(matrix, parent); // Recursively fill the matrix for each parent
     }
 }
+
+// Counts the number of paths from each node to the start node
+std::vector<int> GraphShortestPathSolution::count_path_to_start(int destination) {
+    std::vector<int> count_path(graph->n, -1); // Initialize path counts to 0
+    _count_path_to_start(destination, count_path); // Count paths recursively
+    return count_path; // Return the path counts
+}
+
+// Recursive helper function to count the number of paths from each node to the start node
+int GraphShortestPathSolution::_count_path_to_start(int destination, std::vector<int> &count_path) {
+    if (destination == start) {
+        return 1; // Base case: path to itself
+    }
+    if (count_path[destination] != -1) {
+        return count_path[destination]; // Return cached result if already computed
+    }
+    int count = 0; // Initialize path count
+    for (auto parent : path_parent[destination]) { // Iterate over all parents of the destination
+        count += _count_path_to_start(parent, count_path); // Count paths recursively
+    }
+    count_path[destination] = count; // Cache the result
+    return count; // Return the total path count
+}
+
+// Counts the number of paths from each node to the destination node
+std::vector<int> GraphShortestPathSolution::count_path_to_destination(int destination) {
+    std::vector<int> count_path(graph->n, -1); // Initialize path counts to 0
+    _count_path_to_destination(destination, start, count_path, shortest_paths_to_matrix(destination)); // Count paths recursively
+    return count_path; // Return the path counts
+}
+
+// Recursive helper function to count the number of paths from each node to the destination node
+int GraphShortestPathSolution::_count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<std::vector<int>> matrix) {
+    if (current == destination) {
+        return 1; // Base case: path to itself
+    }
+    if (count_path[current] != -1) {
+        return count_path[current]; // Return cached result if already computed
+    }
+    int count = 0; // Initialize path count
+    for (int i = 0; i < graph->n; i++) { // Iterate over all nodes
+        if (matrix[current][i] == 1) { // If there's a path from current to `i`
+            count += _count_path_to_destination(destination, i, count_path, matrix); // Count paths recursively
+        }
+    }
+    count_path[current] = count; // Cache the result
+    return count; // Return the total path count
+}
