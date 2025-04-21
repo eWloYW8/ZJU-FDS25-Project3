@@ -245,7 +245,7 @@ The core logic follows this sequence:
 
 == Testcases
 
-=== Testcase 1: Testcase in the origin problem description
+=== Testcase 1: Testcase in the problem description
 The input and output are provided in the problem description.
 
 #table(
