@@ -1,6 +1,5 @@
 #include "Graph.h"
 #include <cstdio>
-#include <malloc.h>
 
 // Constructor for the Graph class
 // Initializes a graph with `n` nodes and sets up the adjacency matrix
