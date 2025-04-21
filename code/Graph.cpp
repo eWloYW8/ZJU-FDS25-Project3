@@ -124,14 +124,14 @@ void GraphShortestPathSolution::_shortest_paths_to_matrix(std::vector<std::vecto
 }
 
 // Counts the number of paths from each node to the start node
-std::vector<int> GraphShortestPathSolution::count_path_to_start(int destination) {
+std::vector<int> GraphShortestPathSolution::count_path_to_start(int destination, int threshold) {
     std::vector<int> count_path(graph->n, -1); // Initialize path counts to 0
-    _count_path_to_start(destination, count_path); // Count paths recursively
+    _count_path_to_start(destination, count_path, threshold); // Count paths recursively
     return count_path; // Return the path counts
 }
 
 // Recursive helper function to count the number of paths from each node to the start node
-int GraphShortestPathSolution::_count_path_to_start(int destination, std::vector<int> &count_path) {
+int GraphShortestPathSolution::_count_path_to_start(int destination, std::vector<int> &count_path, int threshold) {
     if (destination == start) {
         return 1; // Base case: path to itself
     }
@@ -140,7 +140,10 @@ int GraphShortestPathSolution::_count_path_to_start(int destination, std::vector
     }
     int count = 0; // Initialize path count
     for (auto parent : path_parent[destination]) { // Iterate over all parents of the destination
-        count += _count_path_to_start(parent, count_path); // Count paths recursively
+        int temp = _count_path_to_start(parent, count_path, threshold); // Count paths recursively
+        if (count <= threshold) { // Check if the count exceeds the threshold
+            count += temp; // Increment the count
+        }
     }
     count_path[destination] = count; // Cache the result
     return count; // Return the total path count
@@ -170,16 +173,16 @@ void GraphShortestPathSolution::_get_path_parent_reverse(int destination, std::v
 }
 
 // Counts the number of paths from each node to the destination node
-std::vector<int> GraphShortestPathSolution::count_path_to_destination(int destination) {
+std::vector<int> GraphShortestPathSolution::count_path_to_destination(int destination, int threshold) {
     std::vector<int> *path_parent_reverse = get_path_parent_reverse(destination); // Get reverse paths
     std::vector<int> count_path(graph->n, -1); // Initialize path counts to 0
-    _count_path_to_destination(destination, start, count_path, path_parent_reverse); // Count paths recursively
+    _count_path_to_destination(destination, start, count_path, path_parent_reverse, threshold); // Count paths recursively
     delete[] path_parent_reverse; // Free allocated memory for reverse paths
     return count_path; // Return the path counts
 }
 
 // Recursive helper function to count the number of paths from each node to the destination node
-int GraphShortestPathSolution::_count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<int> *path_parent_reverse) {
+int GraphShortestPathSolution::_count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<int> *path_parent_reverse, int threshold) {
     if (current == destination) {
         return 1; // Base case: path to itself
     }
@@ -188,7 +191,10 @@ int GraphShortestPathSolution::_count_path_to_destination(int destination, int c
     }
     int count = 0; // Initialize path count
     for (auto parent : path_parent_reverse[current]) { // Iterate over all parents of the current node
-        count += _count_path_to_destination(destination, parent, count_path, path_parent_reverse); // Count paths recursively
+        int temp = _count_path_to_destination(destination, parent, count_path, path_parent_reverse, threshold); // Count paths recursively
+        if (count <= threshold) { // Check if the count exceeds the threshold
+            count += temp; // Increment the count
+        }
     }
     count_path[current] = count; // Cache the result
     return count; // Return the total path count

@@ -4,6 +4,8 @@
 // Define the maximum number of nodes in the graph
 #define GRAPH_MAX_N 500
 
+#define TRANSHUB_NUMBER_THRESHOLD 5 // Threshold for the number of paths to consider a node as a transhub
+
 // Graph class represents a graph with adjacency matrix representation
 class Graph {
 public:
@@ -45,24 +47,24 @@ public:
     std::vector<std::vector<int>> shortest_paths_to_matrix(int destination); 
 
     // Counts the number of paths from each node to the start node
-    std::vector<int> count_path_to_start(int destination);
+    std::vector<int> count_path_to_start(int destination, int threshold = TRANSHUB_NUMBER_THRESHOLD);
 
     // Retrieves the reverse paths from the start node to a given `destination` node 
     std::vector<int>* get_path_parent_reverse(int destination);
 
     // Counts the number of paths from each node to the destination node
-    std::vector<int> count_path_to_destination(int destination);
+    std::vector<int> count_path_to_destination(int destination, int threshold = TRANSHUB_NUMBER_THRESHOLD);
 
 private:
     // Recursive helper function to fill the matrix with path lengths
     void _shortest_paths_to_matrix(std::vector<std::vector<int>> &matrix, int destination);
 
     // Recursive helper function to count the number of paths from each node to the start node
-    int _count_path_to_start(int destination, std::vector<int> &count_path);
+    int _count_path_to_start(int destination, std::vector<int> &count_path, int threshold);
 
     // Recursive helper function to retrieve the reverse paths from the start node to a given `destination` node 
     void _get_path_parent_reverse(int destination, std::vector<int> *path_parent_reverse, std::vector<int> &visited);
 
     // Recursive helper function to count the number of paths from each node to the destination node
-    int _count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<int> *path_parent_reverse);
+    int _count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<int> *path_parent_reverse, int threshold);
 };
