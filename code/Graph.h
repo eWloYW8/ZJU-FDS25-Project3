@@ -48,8 +48,12 @@ public:
     // Counts the number of paths from each node to the start node
     std::vector<int> count_path_to_start(int destination);
 
+    // Retrieves the reverse paths from the start node to a given `destination` node 
+    std::vector<int>* get_path_parent_reverse(int destination);
+
     // Counts the number of paths from each node to the destination node
     std::vector<int> count_path_to_destination(int destination);
+
 
 private:
     // Recursive helper function to fill the matrix with path lengths
@@ -58,6 +62,9 @@ private:
     // Recursive helper function to count the number of paths from each node to the start node
     int _count_path_to_start(int destination, std::vector<int> &count_path);
 
+    // Recursive helper function to retrieve the reverse paths from the start node to a given `destination` node 
+    void _get_path_parent_reverse(int destination, std::vector<int> *path_parent_reverse, std::vector<int> &visited);
+
     // Recursive helper function to count the number of paths from each node to the destination node
-    int _count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<std::vector<int>> matrix);
+    int _count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<int> *path_parent_reverse);
 };

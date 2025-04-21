@@ -1,5 +1,6 @@
 #include "Graph.h"
 #include <cstdio>
+#include <malloc.h>
 
 // Constructor for the Graph class
 // Initializes a graph with `n` nodes and sets up the adjacency matrix
@@ -146,15 +147,40 @@ int GraphShortestPathSolution::_count_path_to_start(int destination, std::vector
     return count; // Return the total path count
 }
 
+// Retrieves the reverse paths from the start node to a given `destination` node
+std::vector<int>* GraphShortestPathSolution::get_path_parent_reverse(int destination) {
+    std::vector<int>* path_parent_reverse = new std::vector<int>[GRAPH_MAX_N]; // Allocate memory for reverse paths
+    std::vector<int> visited = std::vector<int>(graph->n, 0); // Initialize visited array
+    _get_path_parent_reverse(destination, path_parent_reverse, visited); // Fill the reverse paths recursively
+    return path_parent_reverse; // Return the reverse paths
+}
+
+// Recursive helper function to count the number of paths from each node to the start node
+void GraphShortestPathSolution::_get_path_parent_reverse(int destination, std::vector<int> *path_parent_reverse, std::vector<int> &visited) {
+    if (visited[destination]) {
+        return; // If already visited, return to avoid cycles
+    }
+    visited[destination] = 1; // Mark the destination as visited
+    if (destination == start) {
+        return; // Base case: path to itself
+    }
+    for (auto parent : path_parent[destination]) { // Iterate over all parents of the destination
+        path_parent_reverse[parent].push_back(destination); // Add the destination to the parent's reverse path
+        _get_path_parent_reverse(parent, path_parent_reverse, visited); // Recursively fill the reverse paths for each parent
+    }
+}
+
 // Counts the number of paths from each node to the destination node
 std::vector<int> GraphShortestPathSolution::count_path_to_destination(int destination) {
+    std::vector<int> *path_parent_reverse = get_path_parent_reverse(destination); // Get reverse paths
     std::vector<int> count_path(graph->n, -1); // Initialize path counts to 0
-    _count_path_to_destination(destination, start, count_path, shortest_paths_to_matrix(destination)); // Count paths recursively
+    _count_path_to_destination(destination, start, count_path, path_parent_reverse); // Count paths recursively
+    delete[] path_parent_reverse; // Free allocated memory for reverse paths
     return count_path; // Return the path counts
 }
 
 // Recursive helper function to count the number of paths from each node to the destination node
-int GraphShortestPathSolution::_count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<std::vector<int>> matrix) {
+int GraphShortestPathSolution::_count_path_to_destination(int destination, int current, std::vector<int> &count_path, std::vector<int> *path_parent_reverse) {
     if (current == destination) {
         return 1; // Base case: path to itself
     }
@@ -162,10 +188,8 @@ int GraphShortestPathSolution::_count_path_to_destination(int destination, int c
         return count_path[current]; // Return cached result if already computed
     }
     int count = 0; // Initialize path count
-    for (int i = 0; i < graph->n; i++) { // Iterate over all nodes
-        if (matrix[current][i] == 1) { // If there's a path from current to `i`
-            count += _count_path_to_destination(destination, i, count_path, matrix); // Count paths recursively
-        }
+    for (auto parent : path_parent_reverse[current]) { // Iterate over all parents of the current node
+        count += _count_path_to_destination(destination, parent, count_path, path_parent_reverse); // Count paths recursively
     }
     count_path[current] = count; // Cache the result
     return count; // Return the total path count
