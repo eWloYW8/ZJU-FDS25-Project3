@@ -64,7 +64,7 @@ Due to its efficiency and accuracy in sparse graphs, Dijkstra's algorithm is wel
 
 = *Chapter 2*: Algorithm Specification
 
-Before sketching the main program flow, I will first introduce the main steps and algorithms in this project, which include the build of the graph, the Dijkstra algorithm, the restore of the shortest path, and the identification of transportation hubs.
+Before sketching the main program flow, I will first introduce the main steps and algorithms in this project, which include the build of the graph, the Dijkstra algorithm, and the counting of shortest paths passing each node.
 
 == The Build of the Graph
 
@@ -158,92 +158,81 @@ Below is the core pseudocode that captures the algorithm's main logic:
     + *end*
 ]
 
-This modified Dijkstra lays the foundation for backtracking all shortest paths and counting node appearances to identify transportation hubs.
+This modified Dijkstra lays the foundation for counting shortest paths passing each node and identifying transportation hubs.
 
-== Backtracking All Shortest Paths
+== Counting Shortest Paths Passing Each Node
 
-Once the shortest path lengths and their respective predecessors are computed, the next step is to reconstruct *all possible shortest paths* from the start node to a given destination. This is achieved through recursive backtracking.
+To determine how many shortest paths pass through each node, the algorithm employs a two-phase dynamic programming approach that leverages the predecessor relationships captured during the Dijkstra traversal.
 
-Each node maintains a list of its predecessor nodes on any shortest path. To build all paths to the destination, we recursively construct all paths to its predecessors and append the destination node to each of them.
+The core idea is to decompose any shortest path into two segments: from the source to the intermediate node, and from the intermediate node to the destination. The total number of paths passing through a node is then the product of these two independent counts.
 
-This approach ensures that every shortest route from the start node to the destination is captured.
+The process can be summarized as follows:
+1. Reverse Predecessor Graph: Construct a reverse graph where edges point from child nodes to their predecessors in the original shortest path tree.
+2. Path Counting via Backtracking:
+   - For each node, recursively count paths from the source using the original predecessor list.
 
-The pseudocode below illustrates the recursive backtracking logic:
+   - For each node, recursively count paths to the destination using the reverse predecessor graph.
 
-#pseudocode-list[
-  + *function* GetAllShortestPaths(destination: int) → list of paths
-    + *if* destination == start *then*
-      + *return* [[start]]
-    + *if* not solved or path_length[destination] == -1 *then*
-      + *return* []
-    + all_paths ← []
-    + *for* each parent in path_parent[destination]
-      + sub_paths ← GetAllShortestPaths(parent)
-      + *for* each sub_path in sub_paths
-        + sub_path.append(destination)
-        + all_paths.append(sub_path)
-      + *end*
-    + *end*
-    + *return* all_paths
-  + *end*
-]
-
-This method provides the foundation for analyzing node appearances on all shortest paths, enabling the identification of transportation hubs.
-
-== The Identification of Transportation Hubs
-
-After all shortest paths between a pair of cities are generated, the final step is to identify which cities qualify as *transportation hubs*. According to the definition, a city is considered a hub if it appears on at least $k$ of the shortest paths — excluding the start and end cities themselves.
-
-To achieve this, the program counts how many times each city appears across all shortest paths. If the count reaches the given threshold $k$, the city is considered a hub and is included in the output for that source-destination query.
-
-The pseudocode below outlines this identification process:
+3. Combination via Multiplication: Multiply the two directional counts to obtain the total paths passing through each node.
 
 #pseudocode-list[
-  + *function* FindHubs(all_paths, start, destination, k)
-    + count[node] ← 0 for all nodes
-    + *for* each path in all_paths
-      + *for* each node in path
-        + count[node] += 1
+  + *function* CountPaths(source, destination)
+    + *for* each node i
+      + path_to_start[i] ← 0
+    + path_to_start[source] ← 1
+    + *for* nodes in Dijkstra order
+      + *for* each predecessor p in path_parent[i]
+        ▪ path_to_start[i] += path_to_start[p]
       + *end*
     + *end*
-    + hubs ← []
+    + reverse_graph ← empty adjacency list
+    + *for* each node i
+      + *for* each predecessor p in path_parent[i]
+        ▪ add i to reverse_graph[p]
+      + *end*
+    + *end*
+    + *for* each node i
+      + path_to_dest[i] ← 0
+    + path_to_dest[destination] ← 1
+    + *for* nodes in reverse Dijkstra order
+      + *for* each child c in reverse_graph[i]
+        ▪ path_to_dest[i] += path_to_dest[c]
+      + *end*
+    + *end*
     + *for* each node j
-      + *if* count[j] ≥ k and j ≠ start and j ≠ destination
-        + hubs.append(j)
-      + *end*
+      + passing_count[j] ← path_to_start[j] × path_to_dest[j]
     + *end*
-    + *if* hubs is empty
-      + print "None"
-    + *else*
-      + print hubs in ascending order
-    + *end*
-  + *end*
 ]
 
-This procedure ensures that only cities that serve as true intermediaries in multiple shortest paths are labeled as transportation hubs, filtering out source and destination nodes.
+This approach efficiently reuses shortest path information while avoiding explicit enumeration of all possible paths through memoization and topological ordering.
+
 
 == The Main Program Flow
 
-The main function controls the complete execution: from reading input and initializing the graph, to handling multiple test cases and printing the required results. It ensures that each query is handled independently with proper resource management.
+The main function controls the complete execution: from reading input and initializing the graph, to handling multiple test cases and printing the required results. It ensures that each query is handled independently with proper resource management. 
 
-Below is a streamlined pseudocode version focusing only on the main orchestration logic:
+The core logic follows this sequence:
 
-// pseudocode of the main function
 #pseudocode-list[
-  + Read n, m, k
-  + Create graph with n nodes
-  + Read m edges into the graph
-  + Read T test cases
-  + *for* each (start, destination) pair
-    + Create shortest path solver from `start`
-    + Run Dijkstra's algorithm
-    + Retrieve all shortest paths to `destination`
-    + Count appearances of nodes in all paths
-    + Identify transportation hubs based on count
-    + Print results
-    + Reset counters for next case
-  + *end*
+  + *function* Main()
+    + Read graph parameters (n, m, k)
+    + Initialize graph structure
+    + Read T test cases
+    + *for* each test case
+      + Read (start, destination) pair
+      + Initialize shortest path solver with source node
+      + Execute Dijkstra's algorithm
+      + Calculate path counts using bidirectional dynamic programming
+      + Traverse all nodes to check path passing conditions
+        ▪ *if* node is neither start nor destination
+        ▪ *and* path_count ≥ threshold k
+          ▪ Add to output list
+      + *end*
+      + *if* no qualifying nodes → Output "None"
+      + *else* → Output space-separated node IDs
+    + *end*
 ]
+
 
 #pagebreak()
 
@@ -304,7 +293,38 @@ The input contains a query where the start and end nodes are the same. The progr
   ],
 )
 
-=== Testcase 4: High pressure random graph
+=== Testcase 4: Extremely large number of shortest paths
+The input contains a graph with a very high number of shortest paths (larger than INT_MAX) passing through a single node. The program should efficiently count and return the correct transportation hubs.
+
+#table(
+  columns: (1fr, 1fr),
+  align: top,
+  inset: 10pt,
+  [Input], [Output],
+  [
+    #raw("132 260 5
+0 1 1
+0 2 1
+1 3 1
+1 4 1
+2 3 1
+2 4 1
+...
+128 130 1
+129 131 1
+130 131 1
+1
+0 131
+
+(for complete sample, see:
+code/test_sample/large_number_test.in)", block: true)
+  ],
+  [
+    #raw(read("../code/test_sample/large_number_test.out"), block: true)
+  ],
+)
+
+=== Testcase 5: High pressure random graph
 The input contains a large random graph with many nodes and edges generated by a python generator script.
 
 The testcase generation algorithm is as follows:
@@ -352,12 +372,12 @@ The program passes all the test cases shown above with high performance, includi
 
 = *Chapter 4*: Analysis and Comments
 
-We only analyze the complexity of the Dijkstra algorithm and the Backtracking process, as they are the most time-consuming parts of the program.
+We only analyze the complexity of the Dijkstra algorithm and the counting of shortest paths passing each node, as they are the most time-consuming parts of the program.
 
 == The Dijkstra Algorithm
 
 === Time Complexity  
-The time complexity of the provided Dijkstra's algorithm implementation is O(V²), where $V$ is the number of nodes in the graph. This is because:  
+The time complexity of the provided Dijkstra's algorithm implementation is $O(V²)$, where $V$ is the number of nodes in the graph. This is because:  
 1. The algorithm uses two nested loops over all nodes ($V$ iterations each).  
 2. For each node, it scans all other nodes to find the unvisited node with the smallest path length (O(V) per iteration).  
 3. Updating neighbors also iterates over all nodes (O(V) per iteration), leading to a total of $O(V²)$ operations.  
@@ -374,52 +394,49 @@ The adjacency matrix dominates the space usage, making the overall complexity qu
 === Improvements
 - Using a priority queue to optimize the selection of the next node to visit can reduce the time complexity to O((V + E) log V), where $E$ is the number of edges.
 
-== Backtracking Paths
+== Counting Shortest Paths Passing Each Node
 
-=== Time Complexity  
-The time complexity of the Path Backtracking process is O(P × V), where $P$ is the number of shortest paths from the start to the destination, and $V$ is the number of nodes. This is because:  
-1. For each parent of the destination node, the function recursively generates all sub-paths to that parent. If a node has multiple parents (e.g., in a grid-like graph), this leads to combinatorial branching.  
-2. Appending the destination node to each sub-path takes $O(V)$ time per path.  
-In the worst case (e.g., a fully connected graph where every node is a parent of its successors), the number of paths $P$ grows exponentially with $V$, resulting in O(2^V × V) time complexity.
+=== Time Complexity
+The overall algorithm counts the number of shortest paths passing through each node by computing:
 
-=== Space Complexity  
-The space complexity is O(P × V) due to:  
-1. Storing all generated paths in memory, where each path contains up to $O(V)$ nodes.  
-2. The recursion stack depth can reach $O(V)$ (for paths spanning all nodes).  
-In scenarios with exponentially many shortest paths (e.g., graphs with redundant shortest paths), the space complexity becomes O(2^V × V).  
-Additionally, the `path_parent` structure (precomputed in Dijkstra’s algorithm) contributes $O(V^2)$ space, but this is considered part of the input and not the algorithm’s working space.
+1. The number of shortest paths from each node to the `start` node.
+2. The number of shortest paths from each node to the `destination` node (via reverse traversal).
+3. The final count of paths passing through a node as the product of the above two quantities.
+
+The main operations can be broken down as follows:
+
+1. *Recursive Path Counting (Forward and Reverse)*:  
+   Both `count_path_to_start` and `count_path_to_destination` use memoized depth-first search (DFS) to traverse the graph and count the number of paths. Each recursive traversal explores the directed acyclic graph formed by the shortest paths (stored in `path_parent`).  
+   - In the worst case, if the graph has $E$ edges, and all of them are part of the shortest path DAG, then each recursive function visits each edge at most once.
+   - Thus, the complexity of each counting phase is *$O(V + E)$*, where $V$ is the number of nodes and $E$ is the number of edges on shortest paths.
+
+2. *Reverse Path Construction*:  
+   The function `get_path_parent_reverse` builds a reverse graph of shortest paths using a DFS traversal over `path_parent`. Each edge is traversed at most once, leading to a complexity of *$O(V + E)$*.
+
+3. *Final Path Count Calculation*:  
+   After computing the forward and reverse path counts, the algorithm computes the number of paths passing through each node by multiplying the two counts for every node. This step takes *$O(V)$* time.
+
+*Total Time Complexity*:  
+Combining all parts, the total time complexity is:  *$O(V + E)$*
+
+
+If the graph is dense and nearly all edges lie on shortest paths, the worst-case time complexity becomes: *$O(V^2)$*
+
+=== Space Complexity
+1. *Shortest Path DAGs* (`path_parent` and `path_parent_reverse`):  
+   These store parent relationships for each node along shortest paths. In the worst case (e.g., multiple shortest paths between many pairs), each node may have up to $O(V)$ parents, leading to *$O(V²)$* space usage.
+
+2. *Path Count Arrays*:  
+   Arrays such as `count_path`, `visited`, and the final product array `count_path_passing_node` each require *$O(V)$* space.
+
+3. *Call Stack (Recursive DFS)*:  
+   The recursion depth is at most $O(V)$, so stack space usage is also bounded by *$O(V)$*.
+
+*Total Space Complexity*: *$O(V^2)$*
 
 === Improvements
-Maybe the process can be skiped if the number of paths is too large, and we can just count the number of paths passing each node.
-
-Based on this conjecture, The follwing is a possible improvement to the algorithm:
-
-#note(name: [Graph Theory and Linear Algebra])[
-
-An unweighted directed graph can be represented as an adjacency matrix A, where each entry (i, j) is either 1 or 0:
-
-- `1` indicates the presence of a directed edge from node `i` to node `j`.
-- `0` indicates the absence of such an edge.
-
-A more universal interpretation is that this matrix encodes the number of edges of length 1 between any pair of points.
-
-Based on the matrix multiplication principle, the power of matrix A, denoted as $A^k$, reflects the number of distinct paths of length k between any two nodes in the graph. Specifically:
-
-- The entry (i, j) in $A^k$ represents the number of paths of exactly length k from node `i` to node `j`.
-- This property can be extended to compute the total number of paths of length ≤ k by summing the powers of A from 1 to k: $ A + A^2 + ... + A^k $
-- The total number of paths from node `i` to node `j` of any length can be computed by summing all powers of A: $ A + A^2 + A^3 + ... + A^k + ... = A(I-A)^(-1) = (I-A)^(-1)-I $
-]
-
-In this project, we can restore the shortest paths to a matrix A, which is much more efficient when the number of paths is large. The matrix A can be constructed as follows, then we can calculate $P = (I-A)^(-1)-I$, which gives us the number of paths between any two nodes.
-
-The number of shortest paths which passes the node N can be calculated by the following formula:
-$ P["start"][N] times P[N]["destination"] $
-
-Then compare the number of paths with the threshold $k$ to determine if the node N is a transportation hub.
-
-This matrix-based approach offers a more scalable alternative to recursive backtracking, especially for dense graphs or graphs with a high degree of redundancy in shortest paths.
-
-*I'm not using this algorithm for this project because linear algebra-related computations require libraries like BLAS, MKL, etc., and leverage hardware features to fully utilize their advantages. If you're interested, you can try implementing it.*
+- Early termination when a threshold is exceeded helps mitigate performance degradation in cases with combinatorially many shortest paths.
+- Path counting to start node and the reverse process can be executed in the same loop.
 
 #pagebreak()
 
@@ -437,7 +454,7 @@ Even though the project is small, it uses CMake for management.
 
 == Graph.cpp / Graph.h
 
-This module provides functionality for representing and analyzing graphs. It includes a `Graph` class to store graph data (nodes and weighted edges) and a `GraphShortestPathSolution` class to compute and retrieve all shortest paths from a given start node to any destination node in the graph. The implementation supports graphs with up to 500 nodes.
+This module provides functionality for representing and analyzing graphs. It includes a `Graph` class to store graph data (nodes and weighted edges) and a `GraphShortestPathSolution` class to compute and count shortest paths from a given start node to any destination node in the graph. The implementation supports graphs with up to 500 nodes.
 
 #codex(read("../code/Graph.h"), filename: [*File*: Graph.h], lang: "cpp")
 

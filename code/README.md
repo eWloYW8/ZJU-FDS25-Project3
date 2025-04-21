@@ -12,7 +12,7 @@ Even though the project is small, it uses CMake for management.
 
 ## Graph.cpp / Graph.h
 
-This module provides functionality for representing and analyzing graphs. It includes a `Graph` class to store graph data (nodes and weighted edges) and a `GraphShortestPathSolution` class to compute and retrieve all shortest paths from a given start node to any destination node in the graph. The implementation supports graphs with up to 500 nodes.
+This module provides functionality for representing and analyzing graphs. It includes a `Graph` class to store graph data (nodes and weighted edges) and a `GraphShortestPathSolution` class to compute and count shortest paths from a given start node to any destination node in the graph. The implementation supports graphs with up to 500 nodes.
 
 > Note: You may think the class `GraphShortestPathSolution` class is abstract, but in fact the encapsulation of `GraphShortestPathSolution` as a separate class from `Graph` follows the separation of concerns principle, where the graph structure (`Graph`) is decoupled from the algorithm logic (`GraphShortestPathSolution`). This design offers flexibility—multiple algorithms or solutions (e.g., Dijkstra, BFS) can operate on the same `Graph` instance without modifying its core structure. It also enables state isolation, as each solution (e.g., different start nodes) maintains its own `visited`, `path_parent`, and `path_length` arrays, avoiding redundant recomputation. While unintuitive at first, this approach improves modularity, reusability, and scalability for graph algorithms.
 
@@ -215,7 +215,7 @@ To avoid missing the output, you should run the program in a terminal instead of
 
 ## Graph.cpp / Graph.h
 
-该模块提供用于表示和分析图的功能。它包含一个 `Graph` 类用于存储图数据（节点和带权边），以及一个 `GraphShortestPathSolution` 类，用于计算并检索从给定起点到图中任意目标点的所有最短路径。实现支持最多 500 个节点的图。
+该模块提供用于表示和分析图的功能。它包含一个 `Graph` 类用于存储图数据（节点和带权边），以及一个 `GraphShortestPathSolution` 类，用于计算并计数从给定起点到图中任意目标点的所有最短路径。实现支持最多 500 个节点的图。
 
 > 注意：你可能会认为 `GraphShortestPathSolution` 类是抽象的，但事实上，将 `GraphShortestPathSolution` 与 `Graph` 分离成两个类，是出于关注点分离原则的考虑：图结构（`Graph`）与算法逻辑（`GraphShortestPathSolution`）被解耦。这种设计提供了灵活性——多个算法或解法（如 Dijkstra、BFS）都可以在同一个 `Graph` 实例上运行，而无需修改其核心结构。同时也实现了状态隔离，每个解法（例如使用不同的起点）都有自己独立的 `visited`、`path_parent` 和 `path_length` 数组，避免重复计算。虽然初看上去不太直观，但这种方式提升了图算法模块的可维护性、可复用性和可扩展性。
 
